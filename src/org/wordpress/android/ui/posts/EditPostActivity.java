@@ -22,6 +22,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -42,6 +43,7 @@ import android.text.format.DateUtils;
 import android.text.method.ArrowKeyMovementMethod;
 import android.text.style.AlignmentSpan;
 import android.text.style.CharacterStyle;
+import android.text.style.ForegroundColorSpan;
 import android.text.style.QuoteSpan;
 import android.text.style.StrikethroughSpan;
 import android.text.style.StyleSpan;
@@ -131,7 +133,7 @@ public class EditPostActivity extends SherlockActivity implements OnClickListene
     private EditText mTitleEditText, mPasswordEditText, mTagsEditText, mExcerptEditText;
     private TextView mLocationText, mPubDateText;
     private ToggleButton mBoldToggleButton, mEmToggleButton, mBquoteToggleButton;
-    private ToggleButton mUnderlineToggleButton, mStrikeToggleButton;
+    private ToggleButton mUnderlineToggleButton, mStrikeToggleButton, mColorToggleButton;
     private Button mPubDateButton, mLinkButton, mMoreButton;
     private RelativeLayout mFormatBar;
 
@@ -258,6 +260,7 @@ public class EditPostActivity extends SherlockActivity implements OnClickListene
         mPasswordEditText = (EditText) findViewById(R.id.post_password);
         mLocationText = (TextView) findViewById(R.id.locationText);
         mBoldToggleButton = (ToggleButton) findViewById(R.id.bold);
+        mColorToggleButton = (ToggleButton) findViewById(R.id.colour);
         mEmToggleButton = (ToggleButton) findViewById(R.id.em);
         mBquoteToggleButton = (ToggleButton) findViewById(R.id.bquote);
         mUnderlineToggleButton = (ToggleButton) findViewById(R.id.underline);
@@ -458,6 +461,7 @@ public class EditPostActivity extends SherlockActivity implements OnClickListene
         mAddPictureButton.setOnClickListener(this);
         mPubDateButton.setOnClickListener(this);
         mBoldToggleButton.setOnClickListener(this);
+        mColorToggleButton.setOnClickListener(this);
         mLinkButton.setOnClickListener(this);
         mEmToggleButton.setOnClickListener(this);
         mUnderlineToggleButton.setOnClickListener(this);
@@ -592,6 +596,8 @@ public class EditPostActivity extends SherlockActivity implements OnClickListene
         int id = v.getId();
         if (id == R.id.bold) {
             formatBtnClick(mBoldToggleButton, "strong");
+        } else if (id == R.id.colour) {
+            formatBtnClick(mColorToggleButton, "color");
         } else if (id == R.id.em) {
             formatBtnClick(mEmToggleButton, "em");
         } else if (id == R.id.underline) {
@@ -1023,6 +1029,19 @@ public class EditPostActivity extends SherlockActivity implements OnClickListene
                                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         }
                         toggleButton.setChecked(false);
+                    } else if (tag.equals("color")) {
+                        ForegroundColorSpan[] ss = str.getSpans(selectionStart, selectionEnd, ForegroundColorSpan.class);
+                        boolean exists = false;
+                        for (int i = 0; i < ss.length; i++) {
+                                str.removeSpan(ss[i]);
+                                exists = true;
+                        }
+
+                        if (!exists) {
+                            str.setSpan(new ForegroundColorSpan(Color.RED), selectionStart, selectionEnd,
+                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
+                        toggleButton.setChecked(false);
                     } else if (tag.equals("u")) {
 
                         WPUnderlineSpan[] ss = str.getSpans(selectionStart, selectionEnd, WPUnderlineSpan.class);
@@ -1117,7 +1136,18 @@ public class EditPostActivity extends SherlockActivity implements OnClickListene
                             s.removeSpan(ss[i]);
                             s.setSpan(new QuoteSpan(), tagStart, tagEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         }
+                    } else if (tag.equals("color")) {
+                        ForegroundColorSpan[] ss = s.getSpans(selectionStart, selectionEnd, ForegroundColorSpan.class);
+                        
+                        for (int i = 0; i < ss.length; i++) {
+                            int tagStart = s.getSpanStart(ss[i]);
+                            int tagEnd = s.getSpanEnd(ss[i]);
+                            s.removeSpan(ss[i]);
+                            s.setSpan(new ForegroundColorSpan(Color.RED), tagStart, tagEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
                     }
+                    
+                    
                 }
             } else {
                 String startTag = "<" + tag + ">";
@@ -1993,6 +2023,19 @@ public class EditPostActivity extends SherlockActivity implements OnClickListene
                     if (!exists)
                         s.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), mStyleStart, position, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
                 }
+                
+                if (mColorToggleButton.isChecked()) {
+                    ForegroundColorSpan[] ss = s.getSpans(mStyleStart, position, ForegroundColorSpan.class);
+                    exists = false;
+                    for (int i = 0; i < ss.length; i++) {
+                        if (ss[i].getForegroundColor() == Color.RED) {
+                            exists = true;
+                        }
+                    }
+                    if (!exists)
+                        s.setSpan(new ForegroundColorSpan(Color.RED), mStyleStart, position, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+                }
+                
                 if (mEmToggleButton.isChecked()) {
                     StyleSpan[] ss = s.getSpans(mStyleStart, position, StyleSpan.class);
                     exists = false;
@@ -2075,6 +2118,7 @@ public class EditPostActivity extends SherlockActivity implements OnClickListene
         Object[] spans = s.getSpans(mContentEditText.getSelectionStart(), mContentEditText.getSelectionStart(), Object.class);
 
         mBoldToggleButton.setChecked(false);
+        mColorToggleButton.setChecked(false);
         mEmToggleButton.setChecked(false);
         mBquoteToggleButton.setChecked(false);
         mUnderlineToggleButton.setChecked(false);
@@ -2097,6 +2141,9 @@ public class EditPostActivity extends SherlockActivity implements OnClickListene
             }
             if (span instanceof StrikethroughSpan) {
                 mStrikeToggleButton.setChecked(true);
+            }
+            if(span instanceof ForegroundColorSpan) {
+                mColorToggleButton.setChecked(true);
             }
         }
     }

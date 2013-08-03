@@ -237,16 +237,25 @@
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" >
-
+                
                 <ToggleButton
                     android:id="@+id/bold"
                     style="@style/WordPress.ToggleButton"
                     android:layout_width="wrap_content"
                     android:layout_height="fill_parent"
-                    android:layout_below="@id/postContent"
-                    android:textOff="B"
-                    android:textOn="B"
-                    android:textStyle="bold" />
+                    android:visibility="invisible"
+                    android:textOff="C"
+                    android:textOn="C" />
+
+                <ToggleButton
+                    android:id="@+id/colour"
+                    style="@style/WordPress.ToggleButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    
+                    android:textOff="C "
+                    android:textOn="C "
+                     />
 
                 <ToggleButton
                     android:id="@+id/em"
@@ -254,9 +263,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="fill_parent"
                     android:layout_marginLeft="6dp"
-                    android:layout_toRightOf="@id/bold"
-                    android:textOff="I "
-                    android:textOn="I "
+                    android:layout_toRightOf="@id/colour"
+                    android:textOff="A "
+                    android:textOn="A "
                     android:textStyle="italic" />
 
                 <ToggleButton
