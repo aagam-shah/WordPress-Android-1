@@ -3,5 +3,7 @@
     <issue id="MissingTranslation">
         <ignore path="res/values/strings.xml" />
     </issue>
-    <issue id="NewApi" severity="ignore" />
+    <issue id="NewApi">
+        <ignore path="src/org/wordpress/android/ui/posts/EditPostActivity.java" />
+    </issue>
 </lint>
